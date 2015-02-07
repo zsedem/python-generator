@@ -22,3 +22,6 @@ install-wheel:
 
 pep8:
 	pep8 --config=.pep8.conf
+
+polltests:
+	while true; do inotifywait -e modify,moved_to,close_write,move_self . &>/dev/null ; check; done

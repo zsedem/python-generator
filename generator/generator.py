@@ -2,16 +2,25 @@ from __future__ import absolute_import, print_function
 import itertools
 
 
+class GeneratorNotRestartable(Exception):
+    pass
+
+
 class GeneratorIteratedTwice(Exception):
     pass
 
 
 class Generator(object):
-    def __init__(self, generator):
-        self._source_generator = generator
+    def __init__(self, generator, iterator_restarter=None):
+        self._original_iterable_object = generator
+        self._iterator_restarter = iterator_restarter
+        self._data_collectors = []
+        self._initialize_generator()
+
+    def _initialize_generator(self):
+        self._source_generator = iter(self._original_iterable_object)
         self._iterate_finished = False
         self._count_iter = 0
-        self._data_collectors = []
 
     def __call_data_collectors(self, result):
         for data_collector in self._data_collectors:
@@ -62,3 +71,9 @@ class Generator(object):
 
     def is_finished(self):
         return self._iterate_finished
+
+    def reset(self):
+        if self._iterator_restarter is None:
+            raise GeneratorNotRestartable("No generator restart function provided for the source object")
+        self._iterator_restarter(self._original_iterable_object)
+        self._initialize_generator()

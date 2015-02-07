@@ -1,5 +1,5 @@
 from __future__ import absolute_import, print_function
-from .. import Generator, GeneratorIteratedTwice, DataCollector
+from .. import Generator, GeneratorIteratedTwice, DataCollector, GeneratorNotRestartable
 import unittest
 
 
@@ -44,6 +44,19 @@ class TestGenerator(unittest.TestCase):
         generator.add_data_collector(summing)
         self._iterate_to_end(generator)
         self.assertEqual(summing.get_collected_data(), sum([1, 2, 3, 4, 5]))
+
+    def test_generator_can_be_reitered_if_reset_function_provided(self):
+        generator = Generator([1, 2, 3], iterator_restarter=id)
+        self.assertEqual(list(generator), [1, 2, 3])
+        self.assertTrue(generator.is_finished())
+        generator.reset()
+        self.assertEqual(list(generator), [1, 2, 3])
+        self.assertTrue(generator.is_finished())
+
+    def test_generator_reset_raise_exception_if_there_was_no_restarter_method_defined(self):
+        generator = Generator([1, 2, 3])
+        with self.assertRaises(GeneratorNotRestartable):
+            generator.reset()
 
     def _iterate_to_end(self, generator):
         for _ in generator:

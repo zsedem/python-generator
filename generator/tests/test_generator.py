@@ -1,5 +1,5 @@
 from __future__ import absolute_import, print_function
-from .. import Generator, GeneratorIteratedTwice
+from .. import Generator, GeneratorIteratedTwice, DataCollector
 import unittest
 
 
@@ -34,6 +34,17 @@ class TestGenerator(unittest.TestCase):
 
     def test_generator_iteration_finished_returns_right(self):
         generator = Generator(iter([1]))
-        for _ in generator:
-            self.assertFalse(generator.is_finished())
+        self.assertFalse(generator.is_finished())
+        self._iterate_to_end(generator)
         self.assertTrue(generator.is_finished())
+
+    def test_generator_collects_data_with_registered_collector(self):
+        generator = Generator(iter([1, 2, 3, 4, 5]))
+        summing = DataCollector(lambda x, y: x + y, 0)
+        generator.add_data_collector(summing)
+        self._iterate_to_end(generator)
+        self.assertEqual(summing.get_collected_data(), sum([1, 2, 3, 4, 5]))
+
+    def _iterate_to_end(self, generator):
+        for _ in generator:
+            pass

@@ -11,11 +11,17 @@ class Generator(object):
         self._source_generator = generator
         self._iterate_finished = False
         self._count_iter = 0
+        self._data_collectors = []
+
+    def __call_data_collectors(self, result):
+        for data_collector in self._data_collectors:
+            data_collector.collect(result)
 
     def __next__(self):
         try:
             result = next(self._source_generator)
             self._count_iter += 1
+            self.__call_data_collectors(result)
             return result
         except StopIteration:
             if not self._iterate_finished:
@@ -50,6 +56,9 @@ class Generator(object):
     def __take(self, count):
         for _ in range(count):
             yield next(self)
+
+    def add_data_collector(self, data_collector):
+        self._data_collectors.append(data_collector)
 
     def is_finished(self):
         return self._iterate_finished

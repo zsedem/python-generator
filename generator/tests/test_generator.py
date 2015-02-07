@@ -31,3 +31,9 @@ class TestGenerator(unittest.TestCase):
         self.assertEqual(len(l), 3, '{} length is not 3'.format(l))
         with self.assertRaises(GeneratorIteratedTwice):
             list(data.iter_chunks(2))
+
+    def test_generator_iteration_finished_returns_right(self):
+        generator = Generator(iter([1]))
+        for _ in generator:
+            self.assertFalse(generator.is_finished())
+        self.assertTrue(generator.is_finished())

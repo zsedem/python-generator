@@ -50,3 +50,6 @@ class Generator(object):
     def __take(self, count):
         for _ in range(count):
             yield next(self)
+
+    def is_finished(self):
+        return self._iterate_finished

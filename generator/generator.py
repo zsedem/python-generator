@@ -36,7 +36,7 @@ class Generator(object):
         while not self._iterate_finished:
             yield chunk
             while self._count_iter % chunk_size != 0 and not self._iterate_finished:
-                print(next(self))
+                next(self)
 
             chunk = self.__get_chunk(chunk_size)
 

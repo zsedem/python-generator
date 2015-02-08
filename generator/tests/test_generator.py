@@ -58,6 +58,11 @@ class TestGenerator(unittest.TestCase):
         with self.assertRaises(GeneratorNotRestartable):
             generator.reset()
 
+    def test_generator_map_method_returns_generator_too(self):
+        generator = Generator([1, 2, 3, 4]).map(lambda x: x % 2 == 0)
+        self.assertIsInstance(generator, Generator)
+        self.assertEqual(list(generator), [False, True, False, True])
+
     def _iterate_to_end(self, generator):
         for _ in generator:
             pass

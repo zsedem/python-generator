@@ -12,6 +12,7 @@ class GeneratorIteratedTwice(Exception):
 
 class Generator(object):
     def __init__(self, generator, iterator_restarter=None):
+        self._mapping_functions = []
         self._original_iterable_object = generator
         self._iterator_restarter = iterator_restarter
         self._data_collectors = []
@@ -29,6 +30,7 @@ class Generator(object):
     def __next__(self):
         try:
             result = next(self._source_generator)
+            result = self.__call_mappings(result)
             self._count_iter += 1
             self.__call_data_collectors(result)
             return result
@@ -77,3 +79,12 @@ class Generator(object):
             raise GeneratorNotRestartable("No generator restart function provided for the source object")
         self._iterator_restarter(self._original_iterable_object)
         self._initialize_generator()
+
+    def map(self, function):
+        self._mapping_functions.append(function)
+        return self
+
+    def __call_mappings(self, result):
+        for func in self._mapping_functions:
+            result = func(result)
+        return result

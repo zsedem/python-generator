@@ -63,6 +63,13 @@ class TestGenerator(unittest.TestCase):
         self.assertIsInstance(generator, Generator)
         self.assertEqual(list(generator), [False, True, False, True])
 
+    def test_generator_calls_callback_functions(self):
+        generator = Generator([1, 2, 3, 4])
+        callback_args = []
+        generator.add_callback(callback_args.append)
+        self._iterate_to_end(generator)
+        self.assertEqual(callback_args, [1, 2, 3, 4])
+
     def _iterate_to_end(self, generator):
         for _ in generator:
             pass

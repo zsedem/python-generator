@@ -15,7 +15,7 @@ class Generator(object):
         self._mapping_functions = []
         self._original_iterable_object = generator
         self._iterator_restarter = iterator_restarter
-        self._data_collectors = []
+        self._callbacks = []
         self._initialize_generator()
 
     def _initialize_generator(self):
@@ -23,16 +23,16 @@ class Generator(object):
         self._iterate_finished = False
         self._count_iter = 0
 
-    def __call_data_collectors(self, result):
-        for data_collector in self._data_collectors:
-            data_collector.collect(result)
+    def __call_callbacks(self, result):
+        for callback in self._callbacks:
+            callback(result)
 
     def __next__(self):
         try:
             result = next(self._source_generator)
             result = self.__call_mappings(result)
             self._count_iter += 1
-            self.__call_data_collectors(result)
+            self.__call_callbacks(result)
             return result
         except StopIteration:
             if not self._iterate_finished:
@@ -68,8 +68,11 @@ class Generator(object):
         for _ in range(count):
             yield next(self)
 
+    def add_callback(self, callback):
+        self._callbacks.append(callback)
+
     def add_data_collector(self, data_collector):
-        self._data_collectors.append(data_collector)
+        self._callbacks.append(data_collector.collect)
 
     def is_finished(self):
         return self._iterate_finished

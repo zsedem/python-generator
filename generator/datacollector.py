@@ -5,10 +5,6 @@ class NonCallableError(TypeError):
     pass
 
 
-class WrongShapedCollectorFunction(Exception):
-    pass
-
-
 class DataCollector(object):
     def __init__(self, collector_func, zero_value):
         self._collector_func = collector_func

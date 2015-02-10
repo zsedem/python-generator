@@ -51,7 +51,7 @@ class Generator(object):
 
         chunk = self.__get_chunk(chunk_size)
         while not self._iterate_finished:
-            yield chunk
+            yield type(self)(chunk)
             while self._count_iter % chunk_size != 0 and not self._iterate_finished:
                 next(self)
 
